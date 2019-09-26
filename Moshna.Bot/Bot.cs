@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using System;
+using Moshna.Bot.Civilization;
+using Telegram.Bot;
 
 namespace Moshna.Bot
 {
@@ -46,6 +48,21 @@ namespace Moshna.Bot
                 if (reply != null && reply.Text != "/немошна")
                 {
                     this.sentimentService.AddToData(reply.Text, false);
+                }
+            }
+            else if (text.StartsWith("/science"))
+            {
+                var values = text.Split(' ');
+                try
+                {
+                    var science = int.Parse(values[1]);
+                    var turn = int.Parse(values[2]);
+                    var result = CivCalculator.CalculateCityResultsForScienceAndTurn(science, turn);
+                    this.botClient.SendTextMessageAsync(e.Message.Chat, result.ToString()).Wait();
+                }
+                catch
+                {
+                    // ignored
                 }
             }
             else
