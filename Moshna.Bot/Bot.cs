@@ -21,9 +21,15 @@ namespace Moshna.Bot
 
         private void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
-            if (e.Message.Text == "Проверка бота")
+            if (string.IsNullOrEmpty(e.Message.Text))
             {
-                this.botClient.SendTextMessageAsync(e.Message.Chat, "Работаю!").Wait();
+                return;
+            }
+
+            var text = e.Message.Text.ToLower();
+            if (text.Contains("наеблищинск"))
+            {
+                this.botClient.SendTextMessageAsync(e.Message.Chat, "МОШНА!!!").Wait();
             }
         }
     }
