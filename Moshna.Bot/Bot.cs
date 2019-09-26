@@ -32,18 +32,18 @@ namespace Moshna.Bot
             }
 
             var text = e.Message.Text.ToLower();
-            if (text == "!мошна")
+            if (text == "/мошна")
             {
                 var reply = e.Message.ReplyToMessage;
-                if (reply != null && reply.Text != "!мошна")
+                if (reply != null && reply.Text != "/мошна")
                 {
                     this.sentimentService.AddToData(reply.Text, true);
                 }
             }
-            else if (text == "!немошна")
+            else if (text == "/немошна")
             {
                 var reply = e.Message.ReplyToMessage;
-                if (reply != null && reply.Text != "!немошна")
+                if (reply != null && reply.Text != "/немошна")
                 {
                     this.sentimentService.AddToData(reply.Text, false);
                 }
