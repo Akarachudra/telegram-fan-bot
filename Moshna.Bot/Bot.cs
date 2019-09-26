@@ -5,10 +5,12 @@ namespace Moshna.Bot
 {
     public class Bot : IBot
     {
+        private readonly ISentimentService sentimentService;
         private readonly TelegramBotClient botClient;
 
-        public Bot(string token)
+        public Bot(ISentimentService sentimentService, string token)
         {
+            this.sentimentService = sentimentService;
             this.botClient = new TelegramBotClient(token);
             this.botClient.OnMessage += this.BotOnMessage;
         }
@@ -27,9 +29,16 @@ namespace Moshna.Bot
             }
 
             var text = e.Message.Text.ToLower();
-            if (text.Contains("наеблищинск"))
+            if (text == "!мошна")
             {
-                this.botClient.SendTextMessageAsync(e.Message.Chat, "МОШНА!!!").Wait();
+            }
+            else
+            {
+                var isMoshna = this.sentimentService.IsMoshna(text);
+                if (isMoshna)
+                {
+                    this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.AuthorSignature}, МОШНА!!!").Wait();
+                }
             }
         }
     }
