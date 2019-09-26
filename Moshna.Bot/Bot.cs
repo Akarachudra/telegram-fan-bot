@@ -31,13 +31,26 @@ namespace Moshna.Bot
             var text = e.Message.Text.ToLower();
             if (text == "!мошна")
             {
+                var reply = e.Message.ReplyToMessage;
+                if (reply != null && reply.Text != "!мошна")
+                {
+                    this.sentimentService.AddToData(reply.Text, true);
+                }
+            }
+            else if (text == "!немошна")
+            {
+                var reply = e.Message.ReplyToMessage;
+                if (reply != null && reply.Text != "!немошна")
+                {
+                    this.sentimentService.AddToData(reply.Text, false);
+                }
             }
             else
             {
                 var isMoshna = this.sentimentService.IsMoshna(text);
                 if (isMoshna)
                 {
-                    this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.AuthorSignature}, МОШНА!!!").Wait();
+                    //this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.From.Username}, МОШНА!!!").Wait();
                 }
             }
         }

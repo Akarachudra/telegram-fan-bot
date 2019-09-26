@@ -9,7 +9,6 @@ namespace Moshna.Bot
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var token = config.AppSettings.Settings["BotToken"].Value;
             var sentimentService = new SentimentService("data.txt");
-            sentimentService.AddToData("Мошна", true);
             var bot = new Bot(sentimentService, token);
             bot.Start();
         }
