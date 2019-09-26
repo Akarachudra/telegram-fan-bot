@@ -109,6 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot.cs" />
+    <Compile Include="Civilization\CityResult.cs" />
+    <Compile Include="Civilization\CivCalculator.cs" />
+    <Compile Include="Civilization\ScienceResult.cs" />
     <Compile Include="IBot.cs" />
     <Compile Include="ISentimentService.cs" />
     <Compile Include="Program.cs" />
