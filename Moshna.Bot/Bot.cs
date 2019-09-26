@@ -50,7 +50,7 @@ namespace Moshna.Bot
                 var isMoshna = this.sentimentService.IsMoshna(text);
                 if (isMoshna)
                 {
-                    //this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.From.Username}, МОШНА!!!").Wait();
+                    this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.From.Username}, МОШНА!!!").Wait();
                 }
             }
         }
