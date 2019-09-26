@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 
 namespace Moshna.Bot
 {
@@ -18,7 +17,11 @@ namespace Moshna.Bot
         public void Start()
         {
             this.botClient.StartReceiving();
-            Thread.Sleep(int.MaxValue);
+        }
+
+        public void Stop()
+        {
+            this.botClient.StopReceiving();
         }
 
         private void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
