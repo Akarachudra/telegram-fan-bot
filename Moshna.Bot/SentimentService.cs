@@ -12,7 +12,7 @@ namespace Moshna.Bot
 
         public SentimentService(string fileName)
         {
-            this.filePath = Path.Combine(Environment.CurrentDirectory, fileName);
+            this.filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
             this.mlContext = new MLContext();
             this.LoadDataAndTrainModel();
         }
