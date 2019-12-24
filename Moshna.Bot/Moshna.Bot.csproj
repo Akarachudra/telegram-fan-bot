@@ -109,6 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot.cs" />
+    <Compile Include="ChatStatistics\StatisticWrapper.cs" />
+    <Compile Include="ChatStatistics\UserMessagesStatistic.cs" />
     <Compile Include="Civilization\CityResult.cs" />
     <Compile Include="Civilization\CivCalculator.cs" />
     <Compile Include="Civilization\ScienceResult.cs" />
