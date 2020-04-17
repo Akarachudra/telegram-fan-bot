@@ -1,4 +1,6 @@
 ﻿using System.Configuration;
+using MongoDB.Driver;
+using Moshna.Bot.ChatStatistics;
 using Topshelf;
 
 namespace Moshna.Bot
@@ -16,13 +18,16 @@ namespace Moshna.Bot
             serviceName = "MoshnaBotDebug";
 #endif
 
+            var mongoClient = new MongoClient("mongodb://localhost:27017/bot");
+            var db = mongoClient.GetDatabase("bot");
+            var messageStatisticCollection = db.GetCollection<MessageStatistic>("MessageStatisticCollection");
             HostFactory.Run(
                 x =>
                 {
                     x.Service<Bot>(
                         s =>
                         {
-                            s.ConstructUsing(name => new Bot(sentimentService, token));
+                            s.ConstructUsing(name => new Bot(sentimentService, new StatisticWrapper(messageStatisticCollection), token));
                             s.WhenStarted(tc => tc.Start());
                             s.WhenStopped(tc => tc.Stop());
                         });

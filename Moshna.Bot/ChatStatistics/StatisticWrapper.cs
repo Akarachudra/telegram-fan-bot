@@ -1,58 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using MongoDB.Driver;
 using Telegram.Bot.Types;
 
 namespace Moshna.Bot.ChatStatistics
 {
-    public static class StatisticWrapper
+    public class StatisticWrapper : IStatisticWrapper
     {
-        private static readonly IList<UserMessagesStatistic> TodayStatistics = new List<UserMessagesStatistic>();
-        private static DateTime today;
+        private readonly IMongoCollection<MessageStatistic> messageStatisticCollection;
 
-        static StatisticWrapper()
+        public StatisticWrapper(IMongoCollection<MessageStatistic> messageStatisticCollection)
         {
-            today = GetToday();
+            this.messageStatisticCollection = messageStatisticCollection;
         }
 
-        public static void ProcessMessage(Message message)
+        public async Task ProcessMessageAsync(Message message)
         {
-            var currentDay = GetToday();
-            if (currentDay > today)
-            {
-                TodayStatistics.Clear();
-                today = currentDay;
-            }
-
+            var chatId = message.Chat.Id;
             var userName = message.From.Username;
-            var userTodayStatistic = TodayStatistics.FirstOrDefault(x => x.UserName == userName);
-            if (userTodayStatistic == null)
+            var messageDay = DateTimeToDay(message.Date);
+            var existsMessage = (await this.messageStatisticCollection.FindAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId))
+                .SingleOrDefault();
+            if (existsMessage == null)
             {
-                TodayStatistics.Add(
-                    new UserMessagesStatistic
+                await this.messageStatisticCollection.InsertOneAsync(
+                    new MessageStatistic
                     {
-                        UserName = userName,
-                        CharsCount = message.Text.Length,
-                        MessagesCount = 1
+                        ChatId = chatId,
+                        Day = messageDay,
+                        UserName = userName
                     });
             }
-            else
-            {
-                userTodayStatistic.CharsCount += message.Text.Length;
-                userTodayStatistic.MessagesCount++;
-            }
+
+            var updateDefinition = new UpdateDefinitionBuilder<MessageStatistic>().Inc(x => x.CharsCount, message.Text.Length).Inc(x => x.MessagesCount, 1);
+            await this.messageStatisticCollection.UpdateOneAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId, updateDefinition);
         }
 
-        public static IList<UserMessagesStatistic> GetTodayOrderedStatistics()
+        public async Task<IList<MessageStatistic>> GetTodayOrderedStatisticsAsync(long chatId)
         {
-            return TodayStatistics.OrderByDescending(x => x.MessagesCount).ToList();
+            var today = DateTimeToDay(DateTime.UtcNow);
+            var statistics = await (await this.messageStatisticCollection.FindAsync(x => x.Day == today && x.ChatId == chatId)).ToListAsync();
+            return statistics.OrderByDescending(x => x.MessagesCount).ThenBy(x => x.CharsCount).ToList();
         }
 
-        private static DateTime GetToday()
+        private static DateTime DateTimeToDay(DateTime dateTime)
         {
-            var dateTime = DateTime.Now;
             var resultDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
-            resultDateTime = DateTime.SpecifyKind(resultDateTime, DateTimeKind.Local);
+            resultDateTime = DateTime.SpecifyKind(resultDateTime, DateTimeKind.Utc);
             return resultDateTime;
         }
     }

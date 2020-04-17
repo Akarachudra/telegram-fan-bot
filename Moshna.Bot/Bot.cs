@@ -8,11 +8,13 @@ namespace Moshna.Bot
     public class Bot : IBot
     {
         private readonly ISentimentService sentimentService;
+        private readonly StatisticWrapper statisticWrapper;
         private readonly TelegramBotClient botClient;
 
-        public Bot(ISentimentService sentimentService, string token)
+        public Bot(ISentimentService sentimentService, StatisticWrapper statisticWrapper, string token)
         {
             this.sentimentService = sentimentService;
+            this.statisticWrapper = statisticWrapper;
             this.botClient = new TelegramBotClient(token);
             this.botClient.OnMessage += this.BotOnMessage;
         }
@@ -27,17 +29,18 @@ namespace Moshna.Bot
             this.botClient.StopReceiving();
         }
 
-        private void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        private async void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
-            if (string.IsNullOrEmpty(e.Message.Text))
+            var message = e.Message;
+            if (string.IsNullOrEmpty(message.Text))
             {
                 return;
             }
 
-            var text = e.Message.Text.ToLower();
+            var text = message.Text.ToLower();
             if (text == "/мошна")
             {
-                var reply = e.Message.ReplyToMessage;
+                var reply = message.ReplyToMessage;
                 if (reply != null && reply.Text != "/мошна")
                 {
                     this.sentimentService.AddToData(reply.Text, true);
@@ -45,7 +48,7 @@ namespace Moshna.Bot
             }
             else if (text == "/немошна")
             {
-                var reply = e.Message.ReplyToMessage;
+                var reply = message.ReplyToMessage;
                 if (reply != null && reply.Text != "/немошна")
                 {
                     this.sentimentService.AddToData(reply.Text, false);
@@ -59,7 +62,7 @@ namespace Moshna.Bot
                     var science = int.Parse(values[1]);
                     var turn = int.Parse(values[2]);
                     var result = CivCalculator.CalculateCityResultsForScienceAndTurn(science, turn);
-                    this.botClient.SendTextMessageAsync(e.Message.Chat, result.ToString()).Wait();
+                    await this.botClient.SendTextMessageAsync(message.Chat, result.ToString());
                 }
                 catch
                 {
@@ -71,7 +74,7 @@ namespace Moshna.Bot
                 const string nickname = "User";
                 const string messagesCount = "Messages";
                 const string charsCount = "Chars";
-                var userStatistics = StatisticWrapper.GetTodayOrderedStatistics();
+                var userStatistics = await this.statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
                 var stringBuilder = new StringBuilder();
                 stringBuilder.Append($"{nickname.PadRight(20)}{messagesCount.PadRight(20)}{charsCount.PadRight(20)}\n");
                 foreach (var userMessagesStatistic in userStatistics)
@@ -80,17 +83,17 @@ namespace Moshna.Bot
                         $"{userMessagesStatistic.UserName.PadRight(20)}{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}{userMessagesStatistic.CharsCount.ToString().PadRight(20)}\n");
                 }
 
-                this.botClient.SendTextMessageAsync(e.Message.Chat, stringBuilder.ToString()).Wait();
+                await this.botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
             }
             else
             {
-                StatisticWrapper.ProcessMessage(e.Message);
+                await this.statisticWrapper.ProcessMessageAsync(message);
                 // turn off moshna checking
                 return;
                 var isMoshna = this.sentimentService.IsMoshna(text);
                 if (isMoshna)
                 {
-                    this.botClient.SendTextMessageAsync(e.Message.Chat, $"{e.Message.From.Username}, МОШНА!!!").Wait();
+                    await this.botClient.SendTextMessageAsync(message.Chat, $"{message.From.Username}, МОШНА!!!");
                 }
             }
         }
