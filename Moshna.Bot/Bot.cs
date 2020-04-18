@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Moshna.Bot.ChatStatistics;
 using Moshna.Bot.Civilization;
 using Telegram.Bot;
+using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
 namespace Moshna.Bot
@@ -20,6 +21,7 @@ namespace Moshna.Bot
             this.statisticWrapper = statisticWrapper;
             this.botClient = new TelegramBotClient(token);
             this.botClient.OnMessage += this.BotOnMessage;
+            this.botClient.OnUpdate += this.BotOnUpdate;
         }
 
         public void Start()
@@ -32,7 +34,12 @@ namespace Moshna.Bot
             this.botClient.StopReceiving();
         }
 
-        private async void BotOnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        private async void BotOnUpdate(object sender, UpdateEventArgs e)
+        {
+            //throw new System.NotImplementedException();
+        }
+
+        private async void BotOnMessage(object sender, MessageEventArgs e)
         {
             var message = e.Message;
             if (string.IsNullOrEmpty(message.Text))
@@ -81,6 +88,10 @@ namespace Moshna.Bot
             {
                 var userStatistics = await this.statisticWrapper.GetTotalOrderedStatisticsAsync(message.Chat.Id);
                 await this.SendStatistics(userStatistics, message);
+            }
+            else if (text.StartsWith("/опрос"))
+            {
+                //var poll = await this.botClient.SendPollAsync(message.Chat.Id, "Srabotaet?", new[] { "Да", "Нет" }, isAnonymous: false);
             }
             else
             {
