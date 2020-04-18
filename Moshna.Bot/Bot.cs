@@ -1,7 +1,10 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using Moshna.Bot.ChatStatistics;
 using Moshna.Bot.Civilization;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace Moshna.Bot
 {
@@ -71,19 +74,13 @@ namespace Moshna.Bot
             }
             else if (text.StartsWith("/флуд"))
             {
-                const string nickname = "User";
-                const string messagesCount = "Messages";
-                const string charsCount = "Chars";
                 var userStatistics = await this.statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
-                var stringBuilder = new StringBuilder();
-                stringBuilder.Append($"{nickname.PadRight(20)}{messagesCount.PadRight(20)}{charsCount.PadRight(20)}\n");
-                foreach (var userMessagesStatistic in userStatistics)
-                {
-                    stringBuilder.Append(
-                        $"{userMessagesStatistic.UserName.PadRight(20)}{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}{userMessagesStatistic.CharsCount.ToString().PadRight(20)}\n");
-                }
-
-                await this.botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
+                await this.SendStatistics(userStatistics, message);
+            }
+            else if (text.StartsWith("/флуд_полная_статистика"))
+            {
+                var userStatistics = await this.statisticWrapper.GetTotalOrderedStatisticsAsync(message.Chat.Id);
+                await this.SendStatistics(userStatistics, message);
             }
             else
             {
@@ -96,6 +93,22 @@ namespace Moshna.Bot
                     await this.botClient.SendTextMessageAsync(message.Chat, $"{message.From.Username}, МОШНА!!!");
                 }
             }
+        }
+
+        private async Task SendStatistics(IEnumerable<MessageStatistic> userStatistics, Message message)
+        {
+            const string nickname = "User";
+            const string messagesCount = "Messages";
+            const string charsCount = "Chars";
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append($"{nickname.PadRight(20)}{messagesCount.PadRight(20)}{charsCount.PadRight(20)}\n");
+            foreach (var userMessagesStatistic in userStatistics)
+            {
+                stringBuilder.Append(
+                    $"{userMessagesStatistic.UserName.PadRight(20)}{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}{userMessagesStatistic.CharsCount.ToString().PadRight(20)}\n");
+            }
+
+            await this.botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
         }
     }
 }

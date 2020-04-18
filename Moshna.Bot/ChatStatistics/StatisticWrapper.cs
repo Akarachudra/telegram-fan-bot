@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Telegram.Bot.Types;
 
@@ -43,6 +44,30 @@ namespace Moshna.Bot.ChatStatistics
             var today = DateTimeToLocalDay(DateTime.UtcNow);
             var statistics = await (await this.messageStatisticCollection.FindAsync(x => x.Day == today && x.ChatId == chatId)).ToListAsync();
             return statistics.OrderByDescending(x => x.MessagesCount).ThenBy(x => x.CharsCount).ToList();
+        }
+
+        public async Task<IList<MessageStatistic>> GetTotalOrderedStatisticsAsync(long chatId)
+        {
+            var result = await this.messageStatisticCollection.Aggregate()
+                                   .Match(x => x.ChatId == chatId)
+                                   .Group(
+                                       y => y.UserName,
+                                       g => new
+                                       {
+                                           UserName = g.Key,
+                                           CharsCount = g.Sum(x => x.CharsCount),
+                                           MessagesCount = g.Sum(x => x.MessagesCount)
+                                       })
+                                   .ToListAsync();
+            return result.Select(
+                             x => new MessageStatistic
+                             {
+                                 ChatId = chatId,
+                                 CharsCount = x.CharsCount,
+                                 MessagesCount = x.MessagesCount,
+                                 UserName = x.UserName
+                             })
+                         .ToList();
         }
 
         private static DateTime DateTimeToLocalDay(DateTime dateTime)

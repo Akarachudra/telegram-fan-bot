@@ -9,5 +9,7 @@ namespace Moshna.Bot.ChatStatistics
         Task ProcessMessageAsync(Message message);
 
         Task<IList<MessageStatistic>> GetTodayOrderedStatisticsAsync(long chatId);
+
+        Task<IList<MessageStatistic>> GetTotalOrderedStatisticsAsync(long chatId);
     }
 }
