@@ -15,20 +15,20 @@ namespace Moshna.Bot.Civilization
         public override string ToString()
         {
             var sb = new StringBuilder();
-            var scienceEnoughResult = this.IsEnough ? "Да" : "Нет";
+            var scienceEnoughResult = IsEnough ? "Да" : "Нет";
             sb.AppendLine($"Достижима ли цель по науке: {scienceEnoughResult}");
-            sb.AppendLine($"Количество науки с городов: {Math.Round(this.TotalScience, 2)}");
+            sb.AppendLine($"Количество науки с городов: {Math.Round(TotalScience, 2)}");
             var city = 0;
-            if (this.CityResults.Count > 0)
+            if (CityResults.Count > 0)
             {
-                var cityResult = this.CityResults[0];
+                var cityResult = CityResults[0];
                 var rationalismString = cityResult.HasRationalism ? "Да" : "Нет";
                 var universityBoostString = cityResult.HasUniversityBoost ? "Да" : "Нет";
                 sb.AppendLine($"Рационализм и эффект специалистов: {rationalismString}");
                 sb.AppendLine($"Улучшение университетов: {universityBoostString}");
             }
 
-            foreach (var cityResult in this.CityResults)
+            foreach (var cityResult in CityResults)
             {
                 city++;
                 sb.AppendLine();

@@ -18,8 +18,8 @@ namespace Moshna.Bot.Tests
         {
             var mongoClient = new MongoClient("mongodb://localhost:27017/test_bot_bd");
             var db = mongoClient.GetDatabase("test_bot_bd");
-            this.messageStatisticCollection = db.GetCollection<MessageStatistic>("MessageStatisticCollection");
-            this.statisticWrapper = new StatisticWrapper(this.messageStatisticCollection);
+            messageStatisticCollection = db.GetCollection<MessageStatistic>("MessageStatisticCollection");
+            statisticWrapper = new StatisticWrapper(messageStatisticCollection);
         }
 
         [SetUp]

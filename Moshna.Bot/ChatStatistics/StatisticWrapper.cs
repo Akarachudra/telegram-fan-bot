@@ -22,11 +22,11 @@ namespace Moshna.Bot.ChatStatistics
             var chatId = message.Chat.Id;
             var userName = message.From.Username;
             var messageDay = DateTimeToLocalDay(message.Date);
-            var existsMessage = (await this.messageStatisticCollection.FindAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId))
+            var existsMessage = (await messageStatisticCollection.FindAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId))
                 .SingleOrDefault();
             if (existsMessage == null)
             {
-                await this.messageStatisticCollection.InsertOneAsync(
+                await messageStatisticCollection.InsertOneAsync(
                     new MessageStatistic
                     {
                         ChatId = chatId,
@@ -36,19 +36,19 @@ namespace Moshna.Bot.ChatStatistics
             }
 
             var updateDefinition = new UpdateDefinitionBuilder<MessageStatistic>().Inc(x => x.CharsCount, message.Text.Length).Inc(x => x.MessagesCount, 1);
-            await this.messageStatisticCollection.UpdateOneAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId, updateDefinition);
+            await messageStatisticCollection.UpdateOneAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId, updateDefinition);
         }
 
         public async Task<IList<MessageStatistic>> GetTodayOrderedStatisticsAsync(long chatId)
         {
             var today = DateTimeToLocalDay(DateTime.UtcNow);
-            var statistics = await (await this.messageStatisticCollection.FindAsync(x => x.Day == today && x.ChatId == chatId)).ToListAsync();
+            var statistics = await (await messageStatisticCollection.FindAsync(x => x.Day == today && x.ChatId == chatId)).ToListAsync();
             return statistics.OrderByDescending(x => x.MessagesCount).ThenBy(x => x.CharsCount).ToList();
         }
 
         public async Task<IList<MessageStatistic>> GetTotalOrderedStatisticsAsync(long chatId)
         {
-            var result = await this.messageStatisticCollection.Aggregate()
+            var result = await messageStatisticCollection.Aggregate()
                                    .Match(x => x.ChatId == chatId)
                                    .Group(
                                        y => y.UserName,

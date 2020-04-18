@@ -30,53 +30,53 @@ namespace Moshna.Bot.Civilization
         {
             var totalScience = 0.0;
             var fromSpecialist = 3;
-            if (this.HasRationalism)
+            if (HasRationalism)
             {
                 fromSpecialist = 5;
             }
 
-            var baseScience = this.CitizensCount + this.AcademyCount * 6 + this.ScienceSpecialistsCount * fromSpecialist;
-            if (this.HasPalace)
+            var baseScience = CitizensCount + AcademyCount * 6 + ScienceSpecialistsCount * fromSpecialist;
+            if (HasPalace)
             {
                 baseScience += 4;
             }
 
-            if (this.HasNationalColledge)
+            if (HasNationalColledge)
             {
                 baseScience += 3;
             }
 
-            if (this.HasLibrary)
+            if (HasLibrary)
             {
-                baseScience += this.CitizensCount / 2;
+                baseScience += CitizensCount / 2;
             }
 
-            if (this.HasSchool)
+            if (HasSchool)
             {
-                baseScience += this.CitizensCount / 2 + 3;
+                baseScience += CitizensCount / 2 + 3;
             }
 
             totalScience += baseScience;
-            if (this.HasNationalColledge)
+            if (HasNationalColledge)
             {
                 totalScience += 0.5 * baseScience;
             }
 
-            if (this.HasUniversity)
+            if (HasUniversity)
             {
                 totalScience += 0.33 * baseScience;
-                if (this.HasUniversityBoost)
+                if (HasUniversityBoost)
                 {
                     totalScience += 0.17 * baseScience;
                 }
             }
 
-            if (this.HasRationalism)
+            if (HasRationalism)
             {
                 totalScience += 0.1 * baseScience;
             }
 
-            if (this.HasLaboratory)
+            if (HasLaboratory)
             {
                 totalScience += 0.5 * baseScience;
             }
@@ -87,15 +87,15 @@ namespace Moshna.Bot.Civilization
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"Жителей: {this.CitizensCount}");
-            sb.AppendLine($"Академий: {this.AcademyCount}");
-            sb.AppendLine($"Научных специалистов: {this.ScienceSpecialistsCount}");
-            sb.AppendLine($"Дворец: {ConvertToString(this.HasPalace)}");
-            sb.AppendLine($"Библиотека: {ConvertToString(this.HasLibrary)}");
-            sb.AppendLine($"Национальный колледж: {ConvertToString(this.HasNationalColledge)}");
-            sb.AppendLine($"Университет: {ConvertToString(this.HasUniversity)}");
-            sb.AppendLine($"Школа: {ConvertToString(this.HasSchool)}");
-            sb.AppendLine($"Лаборатория: {ConvertToString(this.HasLaboratory)}");
+            sb.AppendLine($"Жителей: {CitizensCount}");
+            sb.AppendLine($"Академий: {AcademyCount}");
+            sb.AppendLine($"Научных специалистов: {ScienceSpecialistsCount}");
+            sb.AppendLine($"Дворец: {ConvertToString(HasPalace)}");
+            sb.AppendLine($"Библиотека: {ConvertToString(HasLibrary)}");
+            sb.AppendLine($"Национальный колледж: {ConvertToString(HasNationalColledge)}");
+            sb.AppendLine($"Университет: {ConvertToString(HasUniversity)}");
+            sb.AppendLine($"Школа: {ConvertToString(HasSchool)}");
+            sb.AppendLine($"Лаборатория: {ConvertToString(HasLaboratory)}");
             return sb.ToString();
         }
 

@@ -12,29 +12,29 @@ namespace Moshna.Bot
 
         public SentimentService(string fileName)
         {
-            this.filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-            this.mlContext = new MLContext();
-            this.LoadDataAndTrainModel();
+            filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            mlContext = new MLContext();
+            LoadDataAndTrainModel();
         }
 
         public void AddToData(string text, bool isMoshna)
         {
-            File.AppendAllText(this.filePath, $"{text}\t{Convert.ToInt32(isMoshna)}\n");
-            this.LoadDataAndTrainModel();
+            File.AppendAllText(filePath, $"{text}\t{Convert.ToInt32(isMoshna)}\n");
+            LoadDataAndTrainModel();
         }
 
         public bool IsMoshna(string text)
         {
-            return this.predictionFunction.Predict(new SentimentData { SentimentText = text }).Prediction;
+            return predictionFunction.Predict(new SentimentData { SentimentText = text }).Prediction;
         }
 
         private void LoadDataAndTrainModel()
         {
-            var dataView = this.mlContext.Data.LoadFromTextFile<SentimentData>(this.filePath);
-            var estimator = this.mlContext.Transforms.Text.FeaturizeText("Features", nameof(SentimentData.SentimentText))
-                                .Append(this.mlContext.BinaryClassification.Trainers.SdcaLogisticRegression());
+            var dataView = mlContext.Data.LoadFromTextFile<SentimentData>(filePath);
+            var estimator = mlContext.Transforms.Text.FeaturizeText("Features", nameof(SentimentData.SentimentText))
+                                .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression());
             var model = estimator.Fit(dataView);
-            this.predictionFunction = this.mlContext.Model.CreatePredictionEngine<SentimentData, SentimentPrediction>(model);
+            predictionFunction = mlContext.Model.CreatePredictionEngine<SentimentData, SentimentPrediction>(model);
         }
     }
 }

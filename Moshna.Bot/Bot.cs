@@ -19,24 +19,24 @@ namespace Moshna.Bot
         {
             this.sentimentService = sentimentService;
             this.statisticWrapper = statisticWrapper;
-            this.botClient = new TelegramBotClient(token);
-            this.botClient.OnMessage += this.BotOnMessage;
-            this.botClient.OnUpdate += this.BotOnUpdate;
+            botClient = new TelegramBotClient(token);
+            botClient.OnMessage += BotOnMessage;
+            botClient.OnUpdate += BotOnUpdate;
         }
 
         public void Start()
         {
-            this.botClient.StartReceiving();
+            botClient.StartReceiving();
         }
 
         public void Stop()
         {
-            this.botClient.StopReceiving();
+            botClient.StopReceiving();
         }
 
         private async void BotOnUpdate(object sender, UpdateEventArgs e)
         {
-            //throw new System.NotImplementedException();
+            // throw new System.NotImplementedException();
         }
 
         private async void BotOnMessage(object sender, MessageEventArgs e)
@@ -53,7 +53,7 @@ namespace Moshna.Bot
                 var reply = message.ReplyToMessage;
                 if (reply != null && reply.Text != "/мошна")
                 {
-                    this.sentimentService.AddToData(reply.Text, true);
+                    sentimentService.AddToData(reply.Text, true);
                 }
             }
             else if (text == "/немошна")
@@ -61,7 +61,7 @@ namespace Moshna.Bot
                 var reply = message.ReplyToMessage;
                 if (reply != null && reply.Text != "/немошна")
                 {
-                    this.sentimentService.AddToData(reply.Text, false);
+                    sentimentService.AddToData(reply.Text, false);
                 }
             }
             else if (text.StartsWith("/science"))
@@ -72,7 +72,7 @@ namespace Moshna.Bot
                     var science = int.Parse(values[1]);
                     var turn = int.Parse(values[2]);
                     var result = CivCalculator.CalculateCityResultsForScienceAndTurn(science, turn);
-                    await this.botClient.SendTextMessageAsync(message.Chat, result.ToString());
+                    await botClient.SendTextMessageAsync(message.Chat, result.ToString());
                 }
                 catch
                 {
@@ -81,27 +81,27 @@ namespace Moshna.Bot
             }
             else if (text.StartsWith("/флуд"))
             {
-                var userStatistics = await this.statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
-                await this.SendStatistics(userStatistics, message);
+                var userStatistics = await statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
+                await SendStatistics(userStatistics, message);
             }
             else if (text.StartsWith("/флуд_полная_статистика"))
             {
-                var userStatistics = await this.statisticWrapper.GetTotalOrderedStatisticsAsync(message.Chat.Id);
-                await this.SendStatistics(userStatistics, message);
+                var userStatistics = await statisticWrapper.GetTotalOrderedStatisticsAsync(message.Chat.Id);
+                await SendStatistics(userStatistics, message);
             }
             else if (text.StartsWith("/опрос"))
             {
-                //var poll = await this.botClient.SendPollAsync(message.Chat.Id, "Srabotaet?", new[] { "Да", "Нет" }, isAnonymous: false);
+                // var poll = await this.botClient.SendPollAsync(message.Chat.Id, "Srabotaet?", new[] { "Да", "Нет" }, isAnonymous: false);
             }
             else
             {
-                await this.statisticWrapper.ProcessMessageAsync(message);
+                await statisticWrapper.ProcessMessageAsync(message);
                 // turn off moshna checking
                 return;
-                var isMoshna = this.sentimentService.IsMoshna(text);
+                var isMoshna = sentimentService.IsMoshna(text);
                 if (isMoshna)
                 {
-                    await this.botClient.SendTextMessageAsync(message.Chat, $"{message.From.Username}, МОШНА!!!");
+                    await botClient.SendTextMessageAsync(message.Chat, $"{message.From.Username}, МОШНА!!!");
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace Moshna.Bot
                     $"{userMessagesStatistic.UserName.PadRight(20)}{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}{userMessagesStatistic.CharsCount.ToString().PadRight(20)}\n");
             }
 
-            await this.botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
+            await botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
         }
     }
 }
