@@ -20,7 +20,7 @@ namespace Moshna.Bot.ChatStatistics
         {
             var chatId = message.Chat.Id;
             var userName = message.From.Username;
-            var messageDay = DateTimeToDay(message.Date);
+            var messageDay = DateTimeToLocalDay(message.Date);
             var existsMessage = (await this.messageStatisticCollection.FindAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId))
                 .SingleOrDefault();
             if (existsMessage == null)
@@ -40,13 +40,14 @@ namespace Moshna.Bot.ChatStatistics
 
         public async Task<IList<MessageStatistic>> GetTodayOrderedStatisticsAsync(long chatId)
         {
-            var today = DateTimeToDay(DateTime.UtcNow);
+            var today = DateTimeToLocalDay(DateTime.UtcNow);
             var statistics = await (await this.messageStatisticCollection.FindAsync(x => x.Day == today && x.ChatId == chatId)).ToListAsync();
             return statistics.OrderByDescending(x => x.MessagesCount).ThenBy(x => x.CharsCount).ToList();
         }
 
-        private static DateTime DateTimeToDay(DateTime dateTime)
+        private static DateTime DateTimeToLocalDay(DateTime dateTime)
         {
+            dateTime = dateTime.ToLocalTime();
             var resultDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
             resultDateTime = DateTime.SpecifyKind(resultDateTime, DateTimeKind.Utc);
             return resultDateTime;

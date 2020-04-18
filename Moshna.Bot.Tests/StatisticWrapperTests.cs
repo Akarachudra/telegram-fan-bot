@@ -37,7 +37,7 @@ namespace Moshna.Bot.Tests
                     Id = 523
                 },
                 Text = "some text",
-                Date = DateTime.UtcNow,
+                Date = DateTime.Now,
                 From = new User
                 {
                     Username = "user name"
