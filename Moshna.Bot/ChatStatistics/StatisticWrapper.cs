@@ -49,16 +49,16 @@ namespace Moshna.Bot.ChatStatistics
         public async Task<IList<MessageStatistic>> GetTotalOrderedStatisticsAsync(long chatId)
         {
             var result = await messageStatisticCollection.Aggregate()
-                                   .Match(x => x.ChatId == chatId)
-                                   .Group(
-                                       y => y.UserName,
-                                       g => new
-                                       {
-                                           UserName = g.Key,
-                                           CharsCount = g.Sum(x => x.CharsCount),
-                                           MessagesCount = g.Sum(x => x.MessagesCount)
-                                       })
-                                   .ToListAsync();
+                                                         .Match(x => x.ChatId == chatId)
+                                                         .Group(
+                                                             y => y.UserName,
+                                                             g => new
+                                                             {
+                                                                 UserName = g.Key,
+                                                                 CharsCount = g.Sum(x => x.CharsCount),
+                                                                 MessagesCount = g.Sum(x => x.MessagesCount)
+                                                             })
+                                                         .ToListAsync();
             return result.Select(
                              x => new MessageStatistic
                              {
@@ -67,6 +67,8 @@ namespace Moshna.Bot.ChatStatistics
                                  MessagesCount = x.MessagesCount,
                                  UserName = x.UserName
                              })
+                         .OrderByDescending(x => x.MessagesCount)
+                         .ThenBy(x => x.CharsCount)
                          .ToList();
         }
 
