@@ -79,14 +79,14 @@ namespace Moshna.Bot
                     // ignored
                 }
             }
-            else if (text.StartsWith("/флуд"))
-            {
-                var userStatistics = await statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
-                await SendStatistics(userStatistics, message);
-            }
             else if (text.StartsWith("/флуд_полная_статистика"))
             {
                 var userStatistics = await statisticWrapper.GetTotalOrderedStatisticsAsync(message.Chat.Id);
+                await SendStatistics(userStatistics, message);
+            }
+            else if (text.StartsWith("/флуд"))
+            {
+                var userStatistics = await statisticWrapper.GetTodayOrderedStatisticsAsync(message.Chat.Id);
                 await SendStatistics(userStatistics, message);
             }
             else if (text.StartsWith("/опрос"))
