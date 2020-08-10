@@ -23,7 +23,7 @@ namespace Moshna.Bot.ChatStatistics
             var userName = message.From.Username;
             var messageDay = DateTimeToLocalDay(message.Date);
             var existsMessage = (await messageStatisticCollection.FindAsync(x => x.Day == messageDay && x.UserName == userName && x.ChatId == chatId))
-                .SingleOrDefault();
+                .FirstOrDefault();
             if (existsMessage == null)
             {
                 await messageStatisticCollection.InsertOneAsync(
