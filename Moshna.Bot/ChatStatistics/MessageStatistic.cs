@@ -18,5 +18,11 @@ namespace Moshna.Bot.ChatStatistics
         public long MessagesCount { get; set; }
 
         public long CharsCount { get; set; }
+
+        [BsonIgnore]
+        public double AverageCharsPerMessage
+        {
+            get { return (double)CharsCount / MessagesCount; }
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using Moshna.Bot.ChatStatistics;
@@ -111,12 +113,16 @@ namespace Moshna.Bot
             const string nickname = "User";
             const string messagesCount = "Messages";
             const string charsCount = "Chars";
+            const string averageCharsCount = "AvgCharsPerMessage";
             var stringBuilder = new StringBuilder();
-            stringBuilder.Append($"{nickname.PadRight(20)}{messagesCount.PadRight(20)}{charsCount.PadRight(20)}\n");
+            stringBuilder.Append($"{nickname.PadRight(20)}{messagesCount.PadRight(20)}{charsCount.PadRight(20)}{averageCharsCount.PadRight(20)}\n");
             foreach (var userMessagesStatistic in userStatistics)
             {
                 stringBuilder.Append(
-                    $"{userMessagesStatistic.UserName.PadRight(20)}{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}{userMessagesStatistic.CharsCount.ToString().PadRight(20)}\n");
+                    $"{userMessagesStatistic.UserName.PadRight(20)}" +
+                    $"{userMessagesStatistic.MessagesCount.ToString().PadRight(20)}" +
+                    $"{userMessagesStatistic.CharsCount.ToString().PadRight(20)}" +
+                    $"{Math.Round(userMessagesStatistic.AverageCharsPerMessage, 2).ToString(CultureInfo.InvariantCulture).PadRight(20)}\n");
             }
 
             await botClient.SendTextMessageAsync(message.Chat, stringBuilder.ToString());
