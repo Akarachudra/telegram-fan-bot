@@ -10,6 +10,8 @@ namespace Moshna.Bot.Civilization
 
         public int ScienceSpecialistsCount { get; set; }
 
+        public int SpecialistsCount { get; set; }
+
         public bool HasPalace { get; set; }
 
         public bool HasLibrary { get; set; }
@@ -29,13 +31,15 @@ namespace Moshna.Bot.Civilization
         public double CalculateScience()
         {
             var totalScience = 0.0;
-            var fromSpecialist = 3;
+            var fromScienceSpecialist = 3;
+            var fromSpecialist = 0;
             if (HasRationalism)
             {
-                fromSpecialist = 5;
+                fromScienceSpecialist = 5;
+                fromSpecialist = 2;
             }
 
-            var baseScience = CitizensCount + AcademyCount * 6 + ScienceSpecialistsCount * fromSpecialist;
+            var baseScience = CitizensCount + AcademyCount * 6 + ScienceSpecialistsCount * fromScienceSpecialist + SpecialistsCount * fromSpecialist;
             if (HasPalace)
             {
                 baseScience += 4;
