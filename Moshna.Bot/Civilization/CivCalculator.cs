@@ -5,7 +5,7 @@ namespace Moshna.Bot.Civilization
 {
     public static class CivCalculator
     {
-        private const int MaxCitiesCount = 10;
+        private const int MaxCitiesCount = 6;
         private const double CitizenPerTurns = 5.5;
         private const int AcademysPerTurns = 50;
         private const int CityTurnsOffset = 15;
